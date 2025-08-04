@@ -12,18 +12,22 @@ namespace ScrumStandUpTracker_1.Service
     {
         private readonly IDeveloperRepository _repository;
         private readonly IConfiguration _configuration;
-        public DeveloperService(IDeveloperRepository repository,IConfiguration configuration)
+        private readonly ILogger<DeveloperService> _logger;
+        public DeveloperService(IDeveloperRepository repository,IConfiguration configuration,ILogger<DeveloperService> logger)
         {
             _repository = repository;
             _configuration = configuration;
+            _logger = logger;
         }
         public async Task<bool> RegisterDeveloper(string username, string password)
         {
             var Existing = await _repository.GetDeveloper(username);
             if (Existing != null)
             {
+                _logger.LogWarning("Developer registration failed: Username exists");
                 return false;
             }
+            _logger.LogInformation("Developer registered");
             CreatePasswordHash(password, out byte[] PasswordHash, out byte[] PasswordSalt);
             var developer = new Developer
             {
@@ -55,7 +59,7 @@ namespace ScrumStandUpTracker_1.Service
                 new Claim(ClaimTypes.Name, developer.Username)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Issuer"],

@@ -24,10 +24,15 @@ namespace ScrumStandUpTracker_1.Repositories
         {
             var startDate = date.Date;
             var endDate = startDate.AddDays(1);
-            var statuses = await _myContext.StatusForms.Include(s => s.developer)
-                .Where(s => s.SubmissionDate>=startDate && s.SubmissionDate<=endDate).ToListAsync(); 
+
+            var statuses = await _myContext.StatusForms
+                .Include(s => s.developer)
+                .Where(s => s.SubmissionDate >= startDate && s.SubmissionDate < endDate)
+                .ToListAsync();
+
             return statuses.Select(s => _mapper.Map<StatusFormDTO>(s));
         }
+
         public async Task<IEnumerable<StatusFormDTO>> GetStatusByDeveloperName(string name)
         {
             var statuses = await _myContext.StatusForms.Include(s => s.developer)
@@ -58,12 +63,13 @@ namespace ScrumStandUpTracker_1.Repositories
             status.Blockers = statusdto.Blockers;
             status.SubmissionDate = statusdto.SubmissionDate;
             status.DeveloperId = statusdto.DeveloperId;
+            _myContext.Entry(status).Property(s => s.SubmissionDate).IsModified = true;
             await _myContext.SaveChangesAsync();
         }
         public async Task DeleteStatus(int id)
         {
             var status = await _myContext.StatusForms.FindAsync(id);
-            if (status == null)
+            if (status == null) 
             {
                 throw new KeyNotFoundException($"status form with {id} not found");
             }

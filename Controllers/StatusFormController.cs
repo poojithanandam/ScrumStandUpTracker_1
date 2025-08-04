@@ -5,7 +5,7 @@ using ScrumStandUpTracker_1.Service;
 
 namespace ScrumStandUpTracker_1.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] 
     [ApiController]
     public class StatusFormController : ControllerBase
     {
@@ -49,7 +49,7 @@ namespace ScrumStandUpTracker_1.Controllers
             return NoContent();
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteStatus(int id)
+        public async Task<ActionResult> DeleteStatus(int id)    
         {
             await _service.DeleteStatus(id);
             return NoContent();
