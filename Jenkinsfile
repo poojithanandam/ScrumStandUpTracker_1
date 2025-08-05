@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     tools {
-        // Uncomment and configure if you have .NET SDK configured in Jenkins
-        // dotnet "dotnet6"
+        dotnet 'dotnet6'  // Match the name of your configured .NET SDK in Jenkins Global Tool Configuration
     }
 
     environment {
@@ -13,7 +12,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'your-credentials-id-if-needed', url: 'https://github.com/poojithanandam/ScrumStandUpTracker_1.git'
+                // Use powershell 'git clone' or just git if git plugin is installed
+                checkout scm
             }
         }
 
@@ -42,4 +42,3 @@ pipeline {
         }
     }
 }
-
