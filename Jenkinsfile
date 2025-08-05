@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        dotnetsdk 'dotnet6'  // Match the name of your configured .NET SDK in Jenkins Global Tool Configuration
+        dotnetsdk 'dotnet9'  // Match the name of your configured .NET SDK in Jenkins Global Tool Configuration
     }
 
     environment {
