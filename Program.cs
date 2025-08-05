@@ -5,14 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using ScrumStandUpTracker_1.Data;
 using ScrumStandUpTracker_1.Mappers;
 using ScrumStandUpTracker_1.Models;
-using ScrumStandUpTracker_1.Repositories;
+using ScrumStandUpTracker_1.Repositories;   
 using ScrumStandUpTracker_1.Service;
 using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Setup Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -20,32 +19,24 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Configure DbContext based on environment 
 if (builder.Environment.IsEnvironment("Testing"))
 {
-    // Use InMemory database for testing environment
     builder.Services.AddDbContext<MyContext>(options =>
         options.UseInMemoryDatabase("ScrumStandUpTrackerInMemoryDb"));
 }
 else
 {
-    // Use SQL Server (default for Development/Production)
     builder.Services.AddDbContext<MyContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-
-
-// AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-// Dependency Injection for repositories and services
 builder.Services.AddScoped<IStatusRepository, StatusFormRepository>();
 builder.Services.AddScoped<IDeveloperRepository, DeveloperRepository>();
 builder.Services.AddScoped<StatusFormService>();
 builder.Services.AddScoped<DeveloperService>();
 
-// JWT Authentication configuration
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,7 +53,6 @@ builder.Services.AddAuthentication(options =>
     ClockSkew = TimeSpan.Zero
 });
 
-// Add controllers and other services
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
@@ -75,7 +65,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Serilog request logging
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
